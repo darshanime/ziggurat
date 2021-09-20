@@ -166,9 +166,9 @@
 (defn stop
   "Calls the Ziggurat's state stop fns and then actor-stop-fn."
   [actor-stop-fn modes]
+  (execute-function modes :stop-fn)
   (actor-stop-fn)
-  (stop-common-states)
-  (execute-function modes :stop-fn))
+  (stop-common-states))
 
 (defn- add-shutdown-hook [actor-stop-fn modes]
   (.addShutdownHook

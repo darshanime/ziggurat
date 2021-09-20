@@ -39,28 +39,15 @@
               (is (= 16 @result))))))))
 
 (deftest stop-calls-actor-stop-fn-test
-  (testing "The actor stop fn stops before the ziggurat state"
+  (testing "The actor stop fn stops after the ziggurat state"
     (let [result (atom 1)]
       (with-redefs [streams/start-streams (constantly nil)
                     streams/stop-streams  (fn [_] (reset! result (* @result 2)))
                     tracer/create-tracer  (fn [] (MockTracer.))]
         (with-config
-          (do (init/start #() {} {} [] nil)
+          (do (init/start #() {} {} [:stream-worker] nil)
               (init/stop #(reset! result (+ @result 3)) nil)
-              (is (= 8 @result))))))))
-
-(deftest stop-calls-idempotentcy-test
-  (testing "The stop function should be idempotent"
-    (let [result (atom 1)
-          stop-connection-internal-call-count 1]
-      (with-redefs [streams/start-streams     (constantly nil)
-                    streams/stop-streams      (constantly nil)
-                    rmqc/stop-connection (fn [_] (reset! result (* @result 2)))
-                    tracer/create-tracer      (fn [] (MockTracer.))]
-        (with-config
-          (do (init/start #() {} {} [] nil)
-              (init/stop #(reset! result (+ @result 3)) nil)
-              (is (= 8 @result))))))))
+              (is (= 5 @result))))))))
 
 (deftest start-calls-make-queues-with-both-streams-and-batch-routes-test
   (testing "Start calls make queues with both streams and batch routes"
